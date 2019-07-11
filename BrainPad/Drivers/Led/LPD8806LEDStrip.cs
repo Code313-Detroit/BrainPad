@@ -103,5 +103,17 @@ namespace Drivers.Led
             }
             WriteData();
         }
+
+        /// <summary>
+        /// Turns off a single pixel.
+        /// </summary>
+        /// <param name="pixelNumber"></param>
+        public void ClearSingle(int pixelNumber)
+        {
+            if (pixelNumber > && pixelNumber <= PixelCount)
+            {
+                SetLedColorWithIntensity(pixelNumber, 0x00, 0x00, 0x00, 0x00);
+            }
+        }
     }
 }
