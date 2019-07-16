@@ -34,7 +34,7 @@ namespace Drivers.Led
             var settings = new SpiConnectionSettings
             {
                 Mode = SpiMode.Mode0,
-                ClockFrequency = 10000,
+                ClockFrequency = 100000,
                 DataBitLength = 8,
                 ChipSelectType = SpiChipSelectType.None,
 
@@ -79,9 +79,13 @@ namespace Drivers.Led
         {
             pixelNumber *= 3;
 
-            pixelData[pixelNumber] = (byte)((basePixelValue | green) >> intensity);
-            pixelData[pixelNumber + 1] = (byte)((basePixelValue | red) >> intensity);
-            pixelData[pixelNumber + 2] = (byte)((basePixelValue | blue) >> intensity);
+            byte greenLocal = (byte)(green >> intensity);
+            byte redLocal = (byte)(red >> intensity);
+            byte blueLocal = (byte)(blue >> intensity);
+
+            pixelData[pixelNumber] = (byte)(basePixelValue | greenLocal);
+            pixelData[pixelNumber + 1] = (byte)(basePixelValue | redLocal);
+            pixelData[pixelNumber + 2] = (byte)(basePixelValue | blueLocal);
         }
 
         /// <summary>
@@ -97,9 +101,9 @@ namespace Drivers.Led
         /// </summary>
         public void ClearAll()
         {
-            for (int i = 0; i < PixelCount * 3; i++)
+            for (int i = 0; i < PixelCount ; i++)
             {
-                pixelData[i] = basePixelValue;
+                ClearSingle(i);
             }
             WriteData();
         }
@@ -110,9 +114,9 @@ namespace Drivers.Led
         /// <param name="pixelNumber"></param>
         public void ClearSingle(int pixelNumber)
         {
-            if (pixelNumber > && pixelNumber <= PixelCount)
+            if (pixelNumber >= 0 && pixelNumber <= PixelCount)
             {
-                SetLedColorWithIntensity(pixelNumber, 0x00, 0x00, 0x00, 0x00);
+                SetLedColor(pixelNumber, Color.Black, Intensity.Highest);
             }
         }
     }

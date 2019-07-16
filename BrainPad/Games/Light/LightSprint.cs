@@ -25,7 +25,7 @@ namespace Games.Light
             this.buzzer = new Buzzer();
         }
 
-        public int SpeedLevel { get; private set; }
+        public int SpeedLevel { get; private set; } = 1;
 
         public bool IsGameInProgress { get; private set; }
 
@@ -37,6 +37,7 @@ namespace Games.Light
             buttons.WhenDownButtonReleased += DownButtonReleasedHandler;
             buttons.WhenRightButtonReleased += RightButtonReleasedHandler;
             ledStrip.ClearAll();
+            UpdateDisplay();
         }
 
         /// <summary>
@@ -51,6 +52,7 @@ namespace Games.Light
                 if (timer == null)
                 {
                     TimeSpan interval = GetMotionInterval();
+                    
                     this.timer = new Timer(TimerTick, null, interval, interval);
                 }
                 
@@ -65,9 +67,15 @@ namespace Games.Light
 
         private void AdvanceForward()
         {
-            ledStrip.ClearSingle(CurrentPosition);
+            //if (CurrentPosition > 0)
+            //{
+            //    ledStrip.ClearSingle(CurrentPosition);
+            //}
+            
+            
+            ledStrip.SetLedColor(CurrentPosition, 100, 0, 0, 2);
+            ledStrip.WriteData();
             CurrentPosition += 1;
-            ledStrip.SetLedColor(CurrentPosition, Color.Green, Intensity.MediumHigh);
         }
 
         /// <summary>
@@ -75,6 +83,11 @@ namespace Games.Light
         /// </summary>
         private void CheckGameStatus()
         {
+            if (!IsGameInProgress)
+            {
+                return;
+            }
+
             if ((CurrentPosition + 1) > ledStrip.PixelCount)
             {
                 CleanUp();
@@ -102,7 +115,9 @@ namespace Games.Light
         private void CleanUp()
         {
             IsGameInProgress = false;
+            CurrentPosition = 0;
             this.timer.Dispose();
+            this.timer = null;
             ledStrip.ClearAll();
         }
 
@@ -112,22 +127,12 @@ namespace Games.Light
             return TimeSpan.FromMilliseconds(intervalInMilliseconds);
         }
 
-        private void SetLightsInMotion()
-        {
-            ledStrip.ClearAll();
-
-            for (int ledIndex = 0; ledIndex <= ledStrip.PixelCount; ledIndex++)
-            {
-
-            }
-        }
-
         /// <summary>
         /// Down button pressed and released.
         /// </summary>
         private void DownButtonReleasedHandler()
         {
-            //decrease the speed, 0 is the lowest level
+            //decrease the speed, 1 is the lowest level
             if (SpeedLevel > 1)
             {
                 SpeedLevel -= 1;
@@ -167,8 +172,11 @@ namespace Games.Light
         /// </summary>
         private void UpdateDisplay()
         {
+            display.Clear();
             //update the speed level on the display
-            display.DrawScaledText(0, 0, SpeedLevel.ToString(), 100, 100);
+            display.DrawNumber(0, 0, SpeedLevel);
+
+            display.RefreshScreen();
         }
     }
 }
