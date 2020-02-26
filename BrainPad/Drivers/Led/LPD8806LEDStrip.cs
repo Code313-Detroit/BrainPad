@@ -119,5 +119,20 @@ namespace Drivers.Led
                 SetLedColor(pixelNumber, Color.Black, Intensity.Highest);
             }
         }
+
+        public void FlashAllLights(int red, int green, int blue, int intensity, int cycles)
+        {
+            for (int i = 0; i < cycles; i++)
+            {
+                Thread.Sleep(100);
+                for (int j = 0; j < PixelCount; j++)
+                {
+                    SetLedColor(j, red, green, blue, intensity);
+                }
+                WriteData();
+                Thread.Sleep(100);
+                ClearAll();
+            }
+        }
     }
 }
